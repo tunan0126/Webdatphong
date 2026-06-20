@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HUCE HOTEL - Hệ thống quản lý</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- ==================== VIEW KHÁCH HÀNG ==================== -->
+    <div id="customer-view">
+        <header class="header">
+            <div class="logo" onclick="showHomePage()" style="cursor: pointer;">HUCE HOTEL</div>
+            <nav class="nav-menu">
+                <a href="#" class="nav-link" onclick="showHomePage()">Trang chủ</a>
+                <a href="#" class="nav-link" onclick="showReviewPage()">Đánh giá</a>
+                <a href="#" class="nav-link" onclick="showServicePage()">Dịch vụ</a>
+                <button id="nav-login-btn" class="login-btn-header" onclick="openLoginModal()">ĐĂNG NHẬP</button>
+                <button id="nav-logout-btn" class="login-btn-header" onclick="logout()" style="display: none;">ĐĂNG XUẤT</button>
+                <div id="user-avatar" class="avatar" onclick="showProfilePage()"></div>
+            </nav>
+        </header>
+
+        <main id="home-screen">
+            <section class="hero-banner">
+                <h3 class="subtitle">KHOẢNH KHẮC SANG TRỌNG</h3>
+                <h1 class="main-title">Trải Nghiệm Đẳng Cấp</h1>
+            </section>
+
+            <div class="search-bar-container" id="search-bar">
+                <div class="search-bar">
+                    <div class="search-field"><label>NGÀY ĐẾN</label><input type="date" id="search-checkin"></div>
+                    <div class="search-field"><label>NGÀY ĐI</label><input type="date" id="search-checkout"></div>
+                    <div class="search-field" style="width: 90px;"><label>NGƯỜI LỚN</label><input type="number" id="search-adults" min="1" value="1" style="width: 100%;"></div>
+                    <div class="search-field" style="width: 90px;"><label>TRẺ EM</label><input type="number" id="search-children" min="0" value="0" style="width: 100%;"></div>
+                    <div class="search-field">
+                        <label>LOẠI PHÒNG</label>
+                        <select id="room-type-search">
+                            <option value="all">Tất cả</option>
+                            <option value="Standard Single Room">Standard Single</option>
+                            <option value="Deluxe Double Room">Deluxe Double</option>
+                            <option value="Executive Suite VIP">Suite VIP</option>
+                        </select>
+                    </div>
+                    <button class="search-btn" onclick="searchRooms()">TÌM PHÒNG</button>
+                </div>
+            </div>
+
+            <section class="room-section">
+                <h2>Danh sách phòng trống</h2>
+                <div id="room-container" class="room-grid">Đang tải dữ liệu...</div>
+                <button class="reset-btn" onclick="resetData()">Khôi phục dữ liệu gốc</button>
+            </section>
+        </main>
+
+        <main id="review-screen" style="display: none; background-color: #f8f9fa; padding: 60px 0;">
+            <div class="review-container" style="max-width: 1100px; margin: auto;">
+                <h2 style="text-align: center; font-family: 'Times New Roman', serif; font-size: 36px; margin-bottom: 10px; color: #333;">Đánh giá từ Khách hàng</h2>
+                <p style="text-align: center; color: #666; margin-bottom: 40px;">Những trải nghiệm chân thực nhất tại HUCE Hotel</p>
+                <div id="review-list" class="review-grid"></div>
+            </div>
+        </main>
+
+        <main id="service-screen" style="display: none; background-color: #f8f9fa; padding: 60px 0;">
+            <div class="service-container" style="max-width: 1100px; margin: auto;">
+                <h2 style="text-align: center; font-family: 'Times New Roman', serif; font-size: 36px; margin-bottom: 10px; color: #333;">Dịch Vụ & Tiện Ích</h2>
+                <p style="text-align: center; color: #666; margin-bottom: 40px;">Nâng tầm trải nghiệm nghỉ dưỡng của bạn</p>
+                <div id="service-list" class="room-grid" style="padding: 0 20px;"></div>
+            </div>
+        </main>
+
+        <main id="profile-screen" style="display: none; background-color: #f8f9fa; padding: 40px 0;">
+            <div class="profile-container">
+                <aside class="profile-sidebar">
+                    <div class="profile-avatar-large" id="profile-avatar-large">A</div>
+                    <h3 id="profile-name-display">Người dùng</h3>
+                    <p class="profile-role">Khách hàng thân thiết</p>
+                    <ul class="profile-menu">
+                        <li id="tab-menu-info" class="tab-item active"><a href="#" onclick="switchProfileTab('info')">Thông tin cá nhân</a></li>
+                        <li id="tab-menu-history" class="tab-item"><a href="#" onclick="switchProfileTab('history')">Lịch sử đặt phòng</a></li>
+                        <li id="tab-menu-password" class="tab-item"><a href="#" onclick="switchProfileTab('password')">Đổi mật khẩu</a></li>
+                        <li id="tab-menu-services" class="tab-item"><a href="#" onclick="switchProfileTab('services')">Dịch vụ đã dùng</a></li>
+                    </ul>
+                </aside>
+
+                <section class="profile-content tab-content" id="tab-content-info">
+                    <h2>Thông tin cá nhân</h2>
+                    <div class="profile-form">
+                        <div class="form-row">
+                            <div class="form-group"><label>HỌ VÀ TÊN</label><input type="text" id="prof-fullname"></div>
+                            <div class="form-group"><label>SỐ ĐIỆN THOẠI</label><input type="text" id="prof-phone"></div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group"><label>EMAIL</label><input type="email" id="prof-email" readonly style="background-color: #f4f4f4; color: #888;"></div>
+                            <div class="form-group"><label>SỐ CCCD/PASSPORT</label><input type="text" id="prof-idcard"></div>
+                        </div>
+                        <div class="form-group"><label>ĐỊA CHỈ</label><input type="text" id="prof-address"></div>
+                        <div class="profile-actions"><button class="btn-update" onclick="updateProfile()">CẬP NHẬT THÔNG TIN</button></div>
+                    </div>
+                </section>
+
+                <section class="profile-content tab-content" id="tab-content-history" style="display: none;">
+                    <h2>Lịch sử đặt phòng</h2>
+                    <table class="history-table">
+                        <thead><tr><th>MÃ ĐƠN</th><th>LOẠI PHÒNG</th><th>NGÀY ĐẾN - ĐI</th><th>TRẠNG THÁI</th><th>TỔNG TIỀN</th></tr></thead>
+                        <tbody id="history-tbody"></tbody>
+                    </table>
+                </section>
+
+                <section class="profile-content tab-content" id="tab-content-password" style="display: none;">
+                    <h2>Đổi mật khẩu</h2>
+                    <div class="profile-form" style="max-width: 500px;">
+                        <div class="form-group"><label>MẬT KHẨU HIỆN TẠI</label><input type="password" id="old-password"></div>
+                        <div class="form-group"><label>MẬT KHẨU MỚI</label><input type="password" id="new-password"></div>
+                        <div class="form-group"><label>XÁC NHẬN MẬT KHẨU</label><input type="password" id="confirm-new-password"></div>
+                        <button class="btn-update" onclick="changePassword()">CẬP NHẬT MẬT KHẨU</button>
+                    </div>
+                </section>
+
+                <section class="profile-content tab-content" id="tab-content-services" style="display: none;">
+                    <h2>Dịch vụ đã dùng</h2>
+                    <table class="history-table">
+                        <thead><tr><th>MÃ ĐƠN</th><th>TÊN DỊCH VỤ</th><th>NGÀY SỬ DỤNG</th><th>SỐ LƯỢNG</th><th>TỔNG TIỀN</th></tr></thead>
+                        <tbody id="services-tbody"></tbody>
+                    </table>
+                </section>
+            </div>
+        </main>
+        <footer class="footer"><h2><span class="hotel-name-display">HUCE HOTEL</span></h2><p>© 2026 Quản lý Hệ thống Khách sạn.</p></footer>
+    </div>
+
+    <!-- ==================== VIEW ADMIN PANEL ==================== -->
+    <main id="admin-screen" class="admin-layout" style="display: none;">
+        <aside class="admin-sidebar-nav">
+            <h2 class="admin-logo-text">ADMIN PANEL</h2>
+            <ul class="admin-nav-menu">
+                <li id="nav-admin-rooms" class="active"><a href="#" onclick="switchAdminTab('rooms')">Quản lý Phòng</a></li>
+                <li id="nav-admin-room-types"><a href="#" onclick="switchAdminTab('room-types')">Quản lý Loại phòng</a></li>
+                <li id="nav-admin-bookings"><a href="#" onclick="switchAdminTab('bookings')">Quản lý Đặt phòng</a></li>
+                <li id="nav-admin-services"><a href="#" onclick="switchAdminTab('services')">Quản lý Dịch vụ</a></li>
+                <li id="nav-admin-settings"><a href="#" onclick="switchAdminTab('settings')">Cài đặt hệ thống</a></li>
+            </ul>
+            <button class="admin-logout-btn" onclick="logout()">Đăng xuất</button>
+        </aside>
+        
+        <section class="admin-main-content">
+            <div id="admin-tab-rooms" class="admin-tab-content">
+                <div class="admin-header-bar"><h3>Quản lý Danh sách Phòng</h3><button class="btn-add-room">+ Thêm phòng mới</button></div>
+                <div class="admin-table-container"><table class="admin-data-table">
+                    <thead><tr><th>MÃ PHÒNG</th><th>SỐ PHÒNG</th><th>LOẠI PHÒNG</th><th>TÌNH TRẠNG</th><th>THAO TÁC</th></tr></thead>
+                    <tbody id="admin-rooms-tbody"></tbody>
+                </table></div>
+            </div>
+
+            <div id="admin-tab-room-types" class="admin-tab-content" style="display: none;">
+                <div class="admin-header-bar"><h3>Cấu hình Loại phòng</h3><button class="btn-add-room">+ Thêm loại phòng mới</button></div>
+                <div class="admin-search-bar"><input type="text" id="admin-search-type-input" placeholder="Tìm kiếm..."><button class="admin-search-btn" onclick="searchAdminRoomTypes()">Tìm</button></div>
+                <div class="admin-table-container"><table class="admin-data-table">
+                    <thead><tr><th>MÃ LOẠI</th><th>TÊN LOẠI PHÒNG</th><th>SỐ GIƯỜNG</th><th>SỐ NGƯỜI TỐI ĐA</th><th>ĐƠN GIÁ</th><th>THAO TÁC</th></tr></thead>
+                    <tbody id="admin-room-types-tbody"></tbody>
+                </table></div>
+            </div>
+
+            <div id="admin-tab-bookings" class="admin-tab-content" style="display: none;">
+                <div class="admin-header-bar"><h3>Hệ thống Đặt phòng</h3><button class="btn-add-room">+ Tạo đơn mới</button></div>
+                <div class="admin-search-bar"><input type="text" id="admin-search-booking-input" placeholder="Tìm mã đơn, tên khách..."><button class="admin-search-btn" onclick="searchAdminBookings()">Tìm</button></div>
+                <div class="admin-table-container"><table class="admin-data-table">
+                    <thead><tr><th>MÃ ĐƠN</th><th>KHÁCH HÀNG</th><th>THỜI GIAN</th><th>TỔNG TIỀN</th><th>TRẠNG THÁI</th><th>THAO TÁC</th></tr></thead>
+                    <tbody id="admin-bookings-tbody"></tbody>
+                </table></div>
+            </div>
+
+            <div id="admin-tab-services" class="admin-tab-content" style="display: none;">
+                <div class="admin-header-bar"><h3>Quản lý Dịch vụ</h3><button class="btn-add-room">+ Thêm dịch vụ mới</button></div>
+                <div class="admin-search-bar"><input type="text" id="admin-search-service-input" placeholder="Tìm dịch vụ..."><button class="admin-search-btn" onclick="searchAdminServices()">Tìm</button></div>
+                <div class="admin-table-container"><table class="admin-data-table">
+                    <thead><tr><th>MÃ DV</th><th>TÊN DỊCH VỤ</th><th>DANH MỤC</th><th>ĐƠN GIÁ</th><th>TRẠNG THÁI</th><th>THAO TÁC</th></tr></thead>
+                    <tbody id="admin-services-tbody"></tbody>
+                </table></div>
+            </div>
+
+            <div id="admin-tab-settings" class="admin-tab-content" style="display: none;">
+                <div class="admin-header-bar"><h3>Cài đặt Hệ thống</h3><button class="btn-add-room" style="background-color: #10b981;" onclick="saveAdminSettings()">Lưu cấu hình</button></div>
+                <div class="admin-table-container">
+                    <div class="profile-form" style="max-width: 800px;">
+                        <h4 style="margin-bottom: 15px; color: #334155; border-bottom: 1px solid #eee; padding-bottom: 5px;">Thông tin Cơ bản</h4>
+                        <div class="form-row"><div class="form-group"><label>Tên Khách Sạn</label><input type="text" id="set-hotel-name"></div><div class="form-group"><label>Hotline Hỗ Trợ</label><input type="text" id="set-hotel-phone"></div></div>
+                        <div class="form-group"><label>Địa chỉ</label><input type="text" id="set-hotel-address"></div>
+                        <h4 style="margin-top: 30px; margin-bottom: 15px; color: #334155; border-bottom: 1px solid #eee; padding-bottom: 5px;">Chính sách & Quy định</h4>
+                        <div class="form-row"><div class="form-group"><label>Giờ Check-in</label><input type="time" id="set-checkin-time"></div><div class="form-group"><label>Giờ Check-out</label><input type="time" id="set-checkout-time"></div></div>
+                        <div class="form-group"><label>Thuế VAT (%)</label><input type="number" id="set-vat" min="0" max="100" style="width: 150px;"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ==================== MODALS (DÙNG CHUNG) ==================== -->
+    <div id="login-modal" class="modal-overlay">
+        <div class="login-box">
+            <button class="close-btn" onclick="closeLoginModal()">✕</button>
+            <div class="login-header"><h2><span class="hotel-name-display">HUCE HOTEL</span></h2><p>HỆ THỐNG QUẢN LÝ</p></div>
+            <p class="error-msg" id="login-error" style="display: none;">Sai tên đăng nhập hoặc mật khẩu!</p>
+            <div class="login-form-group"><label>BẠN LÀ AI?</label><select id="user-role"><option value="customer">Khách hàng</option><option value="admin">Quản trị viên</option></select></div>
+            <div class="login-form-group"><label>TÊN ĐĂNG NHẬP / EMAIL</label><input type="email" id="username" placeholder="Nhập email"></div>
+            <div class="login-form-group"><label>MẬT KHẨU</label><input type="password" id="password" placeholder="••••••••"></div>
+            <button class="submit-login-btn" onclick="login()">XÁC THỰC ĐĂNG NHẬP</button>
+            <div class="login-footer">Mới đến lần đầu? <a href="#" onclick="switchToRegister()">Đăng ký tài khoản</a></div>
+        </div>
+    </div>
+
+    <div id="register-modal" class="modal-overlay">
+        <div class="login-box" style="max-height: 90vh; overflow-y: auto;">
+            <button class="close-btn" onclick="closeRegisterModal()">✕</button>
+            <div class="login-header"><h2><span class="hotel-name-display">HUCE HOTEL</span></h2><p>ĐĂNG KÝ THÀNH VIÊN</p></div>
+            <div class="login-form-group"><label>HỌ VÀ TÊN</label><input type="text" id="reg-fullname"></div>
+            <div class="login-form-group"><label>EMAIL (TÊN ĐĂNG NHẬP)</label><input type="email" id="reg-username" placeholder="Nhập email"></div>
+            <div class="login-form-group"><label>SỐ ĐIỆN THOẠI</label><input type="text" id="reg-phone"></div>
+            <div class="login-form-group"><label>SỐ CCCD/PASSPORT</label><input type="text" id="reg-idcard"></div>
+            <div class="login-form-group"><label>ĐỊA CHỈ</label><input type="text" id="reg-address"></div>
+            <div class="login-form-group"><label>MẬT KHẨU</label><input type="password" id="reg-password"></div>
+            <div class="login-form-group"><label>XÁC NHẬN MẬT KHẨU</label><input type="password" id="reg-confirm-password"></div>
+            <button class="submit-login-btn" onclick="register()">ĐĂNG KÝ NGAY</button>
+            <div class="login-footer">Đã có tài khoản? <a href="#" onclick="switchToLogin()">Đăng nhập tại đây</a></div>
+        </div>
+    </div>
+
+    <!-- POPUP XÁC NHẬN ĐẶT PHÒNG CÓ CHỌN DỊCH VỤ -->
+    <div id="booking-modal" class="modal-overlay">
+        <div class="login-box" style="width: 500px; text-align: left; max-height: 90vh; overflow-y: auto;">
+            <button class="close-btn" onclick="closeBookingModal()">✕</button>
+            <div class="login-header" style="text-align: center;">
+                <h2>XÁC NHẬN ĐẶT PHÒNG</h2>
+                <p>Vui lòng kiểm tra thông tin và chọn dịch vụ đi kèm</p>
+            </div>
+            
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 4px; margin-bottom: 20px; border: 1px solid #eee;">
+                <h3 id="booking-room-name" style="color: #b8860b; margin-bottom: 5px;">Tên phòng</h3>
+                <p style="color: #555; font-size: 14px;">Giá phòng: <strong id="booking-room-price" style="color: #333;">0</strong> VND</p>
+            </div>
+
+            <div class="login-form-group">
+                <label style="font-size: 12px; color: #333;">DỊCH VỤ ĐI KÈM (Tùy chọn)</label>
+                <div id="booking-services-list" style="max-height: 180px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; border-radius: 4px; background: white;">
+                    <!-- Checkbox các dịch vụ sẽ tự động đổ vào đây -->
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin: 20px 0; font-size: 18px; font-weight: bold; padding-top: 15px; border-top: 2px dashed #eee;">
+                <span>TỔNG THANH TOÁN:</span>
+                <span id="booking-total-price" style="color: #d4af37;">0 VND</span>
+            </div>
+
+            <button class="submit-login-btn" onclick="submitBooking()" style="background-color: #b8860b;">HOÀN TẤT ĐẶT PHÒNG</button>
+        </div>
+    </div>
+
+    <div id="toast-container"></div>
+    <script src="app.js"></script>
+</body>
+</html>
