@@ -426,6 +426,7 @@ function resetData() { localStorage.clear(); initData(); renderRooms(); checkIni
 // ==================== 6. ADMIN PANEL ====================
 function showAdminPage() {
     hideAllScreens();
+    document.getElementById('customer-view').style.display = 'none'; // <--- THÊM DÒNG NÀY ĐỂ ẨN HEADER & FOOTER KHÁCH
     document.getElementById('admin-screen').style.display = 'flex';
     switchAdminTab('rooms'); 
 }
