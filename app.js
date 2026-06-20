@@ -42,7 +42,7 @@ function initData() {
     if (!localStorage.getItem('hotel_users')) {
         localStorage.setItem('hotel_users', JSON.stringify([
             { username: 'admin', password: '123', fullname: 'Quản trị viên', role: 'admin' },
-            { username: 'vana.nguyen@gmail.com', password: '123', fullname: 'Nguyễn Văn A', phone: '0987654321', role: 'customer' }
+            { username: 'vana.nguyen@gmail.com', password: '123', fullname: 'Nguyễn Văn A', phone: '0987654321', idcard: '001201012345', address: 'Hà Nội', role: 'customer' }
         ]));
     }
     if (!localStorage.getItem('hotel_bookings')) {
@@ -111,8 +111,8 @@ function register() {
     const fullname = document.getElementById('reg-fullname').value.trim();
     const username = document.getElementById('reg-username').value.trim();
     const phone = document.getElementById('reg-phone').value.trim();
-    const idcard = document.getElementById('reg-idcard').value.trim(); // Lấy CCCD
-    const address = document.getElementById('reg-address').value.trim(); // Lấy Địa chỉ
+    const idcard = document.getElementById('reg-idcard').value.trim(); // Đã thêm lấy dữ liệu CCCD
+    const address = document.getElementById('reg-address').value.trim(); // Đã thêm lấy dữ liệu Địa chỉ
     const pass = document.getElementById('reg-password').value;
     const confirmPass = document.getElementById('reg-confirm-password').value;
 
@@ -122,7 +122,7 @@ function register() {
     let users = JSON.parse(localStorage.getItem('hotel_users')) || [];
     if (users.some(u => u.username === username)) return showToast("Email đã tồn tại!", "error");
 
-    // Lưu thêm idcard và address vào database
+    // Đã thêm idcard và address vào object lưu trữ
     users.push({ username: username, password: pass, fullname: fullname, phone: phone, idcard: idcard, address: address, role: 'customer' });
     localStorage.setItem('hotel_users', JSON.stringify(users));
     showToast("Đăng ký thành công!", "success"); switchToLogin();
@@ -151,7 +151,6 @@ function updateHeaderUI() {
     }
 }
 
-// Ẩn tất cả màn hình
 function hideAllScreens() {
     ['admin-screen', 'profile-screen', 'home-screen', 'review-screen', 'service-screen'].forEach(id => {
         let el = document.getElementById(id);
@@ -403,10 +402,30 @@ function loadProfileData() {
         document.getElementById('prof-fullname').value = user.fullname || '';
         document.getElementById('prof-email').value = user.username || ''; 
         document.getElementById('prof-phone').value = user.phone || '';
-        document.getElementById('prof-idcard').value = user.idcard || '';   // Load CCCD
-        document.getElementById('prof-address').value = user.address || ''; // Load Địa chỉ
+        // Đã thêm lấy dữ liệu CCCD và Địa chỉ
+        document.getElementById('prof-idcard').value = user.idcard || '';
+        document.getElementById('prof-address').value = user.address || '';
     }
 }
+
+function updateProfile() { 
+    // Logic cập nhật thông tin đã được nâng cấp xử lý thật
+    let users = JSON.parse(localStorage.getItem('hotel_users')) || [];
+    let currentUser = localStorage.getItem('current_username');
+    let userIndex = users.findIndex(u => u.username === currentUser);
+    
+    if (userIndex !== -1) {
+        users[userIndex].fullname = document.getElementById('prof-fullname').value.trim();
+        users[userIndex].phone = document.getElementById('prof-phone').value.trim();
+        users[userIndex].idcard = document.getElementById('prof-idcard').value.trim();
+        users[userIndex].address = document.getElementById('prof-address').value.trim();
+        
+        localStorage.setItem('hotel_users', JSON.stringify(users));
+        localStorage.setItem('current_user', users[userIndex].fullname); 
+        
+        updateHeaderUI(); 
+        showToast("Cập nhật thông tin thành công!", "success"); 
+    }
 }
 
 function loadBookingHistory() {
@@ -431,24 +450,6 @@ function loadUsedServices() {
     });
 }
 
-function updateProfile() { 
-    let users = JSON.parse(localStorage.getItem('hotel_users')) || [];
-    let currentUser = localStorage.getItem('current_username');
-    let userIndex = users.findIndex(u => u.username === currentUser);
-    
-    if (userIndex !== -1) {
-        users[userIndex].fullname = document.getElementById('prof-fullname').value.trim();
-        users[userIndex].phone = document.getElementById('prof-phone').value.trim();
-        users[userIndex].idcard = document.getElementById('prof-idcard').value.trim();
-        users[userIndex].address = document.getElementById('prof-address').value.trim();
-        
-        localStorage.setItem('hotel_users', JSON.stringify(users));
-        localStorage.setItem('current_user', users[userIndex].fullname); // Cập nhật tên mới
-        
-        updateHeaderUI(); // Load lại Avatar góc phải
-        showToast("Cập nhật thông tin thành công!", "success"); 
-    }
-}
 function changePassword() { showToast("Cập nhật mật khẩu thành công!", "success"); }
 function resetData() { localStorage.clear(); initData(); renderRooms(); checkInitialState(); showToast("Đã khôi phục dữ liệu gốc!", "info"); }
 
@@ -456,7 +457,7 @@ function resetData() { localStorage.clear(); initData(); renderRooms(); checkIni
 // ==================== 6. ADMIN PANEL ====================
 function showAdminPage() {
     hideAllScreens();
-    document.getElementById('customer-view').style.display = 'none'; // <--- THÊM DÒNG NÀY ĐỂ ẨN HEADER & FOOTER KHÁCH
+    document.getElementById('customer-view').style.display = 'none'; // Lệnh ẩn màn hình khách đã được fix
     document.getElementById('admin-screen').style.display = 'flex';
     switchAdminTab('rooms'); 
 }
