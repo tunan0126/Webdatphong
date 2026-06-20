@@ -94,16 +94,25 @@ function login() {
 }
 
 function logout() {
-    localStorage.clear(); initData();
+    // Chỉ xóa các biến phiên đăng nhập, KHÔNG xóa sạch database
+    localStorage.removeItem('is_logged_in');
+    localStorage.removeItem('current_user');
+    localStorage.removeItem('current_username');
+    localStorage.removeItem('current_role');
+    
     document.getElementById('admin-screen').style.display = 'none';
     document.getElementById('customer-view').style.display = 'block';
-    updateHeaderUI(); showHomePage(); showToast("Đã đăng xuất!", "info");
+    updateHeaderUI(); 
+    showHomePage(); 
+    showToast("Đã đăng xuất!", "info");
 }
 
 function register() {
     const fullname = document.getElementById('reg-fullname').value.trim();
     const username = document.getElementById('reg-username').value.trim();
     const phone = document.getElementById('reg-phone').value.trim();
+    const idcard = document.getElementById('reg-idcard').value.trim(); // Lấy CCCD
+    const address = document.getElementById('reg-address').value.trim(); // Lấy Địa chỉ
     const pass = document.getElementById('reg-password').value;
     const confirmPass = document.getElementById('reg-confirm-password').value;
 
@@ -113,7 +122,8 @@ function register() {
     let users = JSON.parse(localStorage.getItem('hotel_users')) || [];
     if (users.some(u => u.username === username)) return showToast("Email đã tồn tại!", "error");
 
-    users.push({ username: username, password: pass, fullname: fullname, phone: phone, role: 'customer' });
+    // Lưu thêm idcard và address vào database
+    users.push({ username: username, password: pass, fullname: fullname, phone: phone, idcard: idcard, address: address, role: 'customer' });
     localStorage.setItem('hotel_users', JSON.stringify(users));
     showToast("Đăng ký thành công!", "success"); switchToLogin();
 }
@@ -393,7 +403,10 @@ function loadProfileData() {
         document.getElementById('prof-fullname').value = user.fullname || '';
         document.getElementById('prof-email').value = user.username || ''; 
         document.getElementById('prof-phone').value = user.phone || '';
+        document.getElementById('prof-idcard').value = user.idcard || '';   // Load CCCD
+        document.getElementById('prof-address').value = user.address || ''; // Load Địa chỉ
     }
+}
 }
 
 function loadBookingHistory() {
@@ -418,7 +431,24 @@ function loadUsedServices() {
     });
 }
 
-function updateProfile() { showToast("Cập nhật thông tin thành công!", "success"); }
+function updateProfile() { 
+    let users = JSON.parse(localStorage.getItem('hotel_users')) || [];
+    let currentUser = localStorage.getItem('current_username');
+    let userIndex = users.findIndex(u => u.username === currentUser);
+    
+    if (userIndex !== -1) {
+        users[userIndex].fullname = document.getElementById('prof-fullname').value.trim();
+        users[userIndex].phone = document.getElementById('prof-phone').value.trim();
+        users[userIndex].idcard = document.getElementById('prof-idcard').value.trim();
+        users[userIndex].address = document.getElementById('prof-address').value.trim();
+        
+        localStorage.setItem('hotel_users', JSON.stringify(users));
+        localStorage.setItem('current_user', users[userIndex].fullname); // Cập nhật tên mới
+        
+        updateHeaderUI(); // Load lại Avatar góc phải
+        showToast("Cập nhật thông tin thành công!", "success"); 
+    }
+}
 function changePassword() { showToast("Cập nhật mật khẩu thành công!", "success"); }
 function resetData() { localStorage.clear(); initData(); renderRooms(); checkInitialState(); showToast("Đã khôi phục dữ liệu gốc!", "info"); }
 
